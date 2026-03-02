@@ -269,7 +269,7 @@ body {
 #soundToggle {
   position: fixed;
   top: 12px;
-  right: 20px; /* will be overridden dynamically but good default */
+  right: 20px;
   z-index: 300;
   background: rgba(26,13,5,0.8);
   border: 1px solid #5a3418;
@@ -280,7 +280,7 @@ body {
   color: #8c5c33;
   cursor: pointer;
   transition: all 0.2s;
-  display: none; /* shown once game starts */
+  display: none;
 }
 #soundToggle:hover { color: #d4a574; border-color: #8c5c33; }
 #soundToggle.active { color: #d4a574; border-color: #d4a574; }
@@ -305,7 +305,6 @@ body {
 .hud-val { font-size: 1.1rem; font-weight: 700; color: #d4a574; }
 #livesDisplay { color: #f87171; font-size: 1.2rem; letter-spacing: 3px; }
 
-/* All-time coin display in HUD */
 #allTimeCoinsHud {
   display: flex; flex-direction: column; align-items: center;
   background: rgba(212,165,116,0.06);
@@ -535,7 +534,6 @@ body {
 #gameOver .stat-line.highlight { color: #FFD700; font-size: 1.2rem; }
 #gameOver .stat-line.highlight span { color: #FFD700; }
 
-/* all-time coins big display */
 .alltime-box {
   background: rgba(255,215,0,0.07);
   border: 1px solid rgba(255,215,0,0.3);
@@ -613,7 +611,7 @@ body {
 <body>
 
 <!-- SOUND TOGGLE (shown after game starts) -->
-<button id="soundToggle" onclick="toggleSound()">🔊 SFX ON</button>
+<button id="soundToggle" onclick="toggleSound()">🔊 spk ON</button>
 
 <!-- NAME SCREEN -->
 <div id="nameScreen">
@@ -792,19 +790,17 @@ function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
-  // Resume if suspended (browser autoplay policy)
   if (audioCtx.state === "suspended") audioCtx.resume();
 }
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
-  soundToggleBtn.textContent = soundEnabled ? "🔊 SFX ON" : "🔇 SFX OFF";
+  soundToggleBtn.textContent = soundEnabled ? "🔊 spk ON" : "🔇 spk OFF";
   soundToggleBtn.classList.toggle("active", soundEnabled);
   if (!soundEnabled) stopBackground();
   else if (gameRunning && !paused) startBackground();
 }
 
-// Core tone with optional pitch sweep
 function playTone(freq, duration, type = "square", volume = 0.2, pitchEnd = null) {
   if (!soundEnabled || !audioCtx) return;
   try {
@@ -822,7 +818,6 @@ function playTone(freq, duration, type = "square", volume = 0.2, pitchEnd = null
   } catch(e) {}
 }
 
-// Noise burst (for crash/impact)
 function playNoise(duration, volume = 0.15, filterFreq = 800) {
   if (!soundEnabled || !audioCtx) return;
   try {
@@ -843,7 +838,6 @@ function playNoise(duration, volume = 0.15, filterFreq = 800) {
   } catch(e) {}
 }
 
-// 🎵 Background — seismic driving pulse, 4 bar patterns
 const BG_PATTERNS = [
   [196, 0, 196, 0, 220, 0, 247, 0],
   [262, 0, 262, 0, 294, 0, 330, 0],
@@ -873,14 +867,12 @@ function stopBackground() {
   if (bgInterval) { clearInterval(bgInterval); bgInterval = null; }
 }
 
-// 🦘 Jump — quick upward chirp + air puff
 function playJump() {
   if (!soundEnabled || !audioCtx) return;
   playTone(300, 0.12, "square", 0.22, 700);
   playNoise(0.04, 0.05, 1400);
 }
 
-// 💥 Crash — deep sub drop + noise explosion
 function playCrash() {
   if (!soundEnabled || !audioCtx) return;
   playTone(80, 0.45, "sawtooth", 0.45, 35);
@@ -888,7 +880,6 @@ function playCrash() {
   playNoise(0.35, 0.38, 500);
 }
 
-// 🪙 Coin — bright metallic triple-ding
 function playCoin() {
   if (!soundEnabled || !audioCtx) return;
   playTone(1047, 0.06, "sine", 0.3);
@@ -896,7 +887,6 @@ function playCoin() {
   setTimeout(() => playTone(2093, 0.12, "sine", 0.14), 100);
 }
 
-// 🏆 Level up — triumphant 4-note fanfare
 function playLevelUp() {
   if (!soundEnabled || !audioCtx) return;
   [523, 659, 784, 1047].forEach((f, i) =>
@@ -905,7 +895,6 @@ function playLevelUp() {
   setTimeout(() => playTone(1047, 0.3, "square", 0.28), 460);
 }
 
-// ⚡ Powerup — ascending shimmer
 function playPowerup() {
   if (!soundEnabled || !audioCtx) return;
   [440, 554, 659, 880, 1109].forEach((f, i) =>
@@ -913,7 +902,6 @@ function playPowerup() {
   );
 }
 
-// 💀 Game over — dramatic descent + final rumble
 function playGameOver() {
   if (!soundEnabled || !audioCtx) return;
   [392, 349, 330, 294, 262, 196].forEach((f, i) =>
@@ -923,8 +911,6 @@ function playGameOver() {
     }, i * 130)
   );
 }
-
-// ──────────────────────────────────────────────────────────
 
 // ── Elements ──
 const character    = document.getElementById("character");
@@ -1023,7 +1009,7 @@ nameInput.addEventListener("input", debounce(() => {
 nameInput.addEventListener("keydown", e => { if (e.key === "Enter") submitName(); });
 
 function submitName() {
-  initAudio(); // init on first user gesture
+  initAudio();
   const n = nameInput.value.trim();
   currentPlayer = n || null;
   allTimeCoins = n ? loadPlayerCoins(n) : 0;
@@ -1128,14 +1114,13 @@ function showCoinSaveFlash(added) {
 }
 
 function startGame(mode) {
-  initAudio(); // ensure audio context is ready on button click
+  initAudio();
   cfg = difficulties[mode];
   gameSpeed = cfg.speed;
   introEl.style.display = "none";
 
-  // Show & style sound toggle
   soundToggleBtn.style.display = "block";
-  soundToggleBtn.textContent = soundEnabled ? "🔊 SFX ON" : "🔇 SFX OFF";
+  soundToggleBtn.textContent = soundEnabled ? "🔊 spk ON" : "🔇 spk OFF";
   soundToggleBtn.classList.toggle("active", soundEnabled);
 
   score = 0; coins = 0; lives = 3; level = 1;
@@ -1147,7 +1132,7 @@ function startGame(mode) {
   updateAllTimeDisplay();
 
   gameRunning = true;
-  startBackground(); // 🎵 start music
+  startBackground();
 
   gameInterval       = setInterval(gameLoop, 16);
   obstacleInterval   = setInterval(spawnObstacle, cfg.obstacleFreq);
@@ -1184,7 +1169,7 @@ function increaseDifficulty() {
   gameSpeed = Math.min(gameSpeed + 0.5, 16);
   showMessage(`LEVEL ${level}!`, "#b8855a");
   levelEl.textContent = level;
-  playLevelUp(); // 🏆 level up sound
+  playLevelUp();
 }
 
 function jump() {
@@ -1192,7 +1177,7 @@ function jump() {
   if (jumpCount >= 2) return;
   jumpCount++;
   isJumping = true;
-  playJump(); // 🦘 jump sound
+  playJump();
   let velocity = jumpCount === 1 ? 15 : 11;
   const ji = setInterval(() => {
     charBottom += velocity;
@@ -1259,7 +1244,6 @@ function spawnObstacle() {
   obstacles.push({ el, x: gameArea.offsetWidth, width, height });
 }
 
-// Logo SVG recreated from the uploaded brand mark
 const COIN_LOGO_SVG = `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="36" fill="#ffe0c0">S</text></svg>`;
 
 function spawnCoin() {
@@ -1331,7 +1315,7 @@ function gameLoop() {
       c.el.remove();
       coins++;
       updateHUD();
-      playCoin(); // 🪙 coin sound
+      playCoin();
       showMessage(`+1 COIN 🪙`, "#d4a574");
       return false;
     }
@@ -1357,7 +1341,7 @@ function handleHit(ex, ey) {
   if (hitCooldown) return;
   hitCooldown = true;
   spawnHitParticles(ex, ey);
-  playCrash(); // 💥 crash sound
+  playCrash();
   lives--;
   updateLives();
   character.classList.add("hit");
@@ -1372,7 +1356,7 @@ function handleHit(ex, ey) {
 
 function activatePowerup(p) {
   showMessage(p.label + " 🎉", "#00f5d4");
-  playPowerup(); // ⚡ powerup sound
+  playPowerup();
   if (p.type === "shield") {
     shielded = true;
     character.classList.add("shielded");
@@ -1392,7 +1376,7 @@ function endGame() {
   gameRunning = false;
   [gameInterval, obstacleInterval, coinInterval, powerupInterval, difficultyInterval].forEach(clearInterval);
   stopBackground();
-  playGameOver(); // 💀 game over sound
+  playGameOver();
   highScore = Math.max(highScore, score);
 
   if (currentPlayer && coins > 0) {
@@ -1431,7 +1415,7 @@ document.addEventListener("keyup", e => { if (e.code === "ArrowDown") stopDuck()
 // ── Touch ──
 let touchStartY = 0;
 document.addEventListener("touchstart", e => {
-  initAudio(); // ensure audio on mobile touch
+  initAudio();
   touchStartY = e.touches[0].clientY;
 }, { passive: true });
 document.addEventListener("touchend", e => {
